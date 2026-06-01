@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Flame, Mic, MessageSquare, Award, Trash2, BookOpen } from "lucide-react";
+import { ArrowLeft, Flame, Clock, MessageCircleHeart, Trophy, Trash2, BookOpen } from "lucide-react";
 import { useHistory, type PastSession } from "@/lib/store";
 
 export default function DashboardPage() {
@@ -57,17 +57,17 @@ export default function DashboardPage() {
 
         <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            icon={<Mic className="h-5 w-5" />}
+            icon={<Clock className="h-5 w-5" />}
             label="Total practice"
             value={`${totalMinutes} min`}
           />
           <StatCard
-            icon={<Award className="h-5 w-5" />}
+            icon={<Trophy className="h-5 w-5" />}
             label="Pronunciation (7d)"
             value={`${avg7}/100`}
           />
           <StatCard
-            icon={<MessageSquare className="h-5 w-5" />}
+            icon={<MessageCircleHeart className="h-5 w-5" />}
             label="Grammar / 100 words"
             value={`${grammarPer100}`}
           />
@@ -225,7 +225,7 @@ function EmptyState({ count }: { count: number }) {
       </header>
       <main className="mx-auto max-w-md px-6 py-20 text-center">
         <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-100 text-brand-700">
-          <Mic className="h-7 w-7" />
+          <BookOpen className="h-7 w-7" />
         </div>
         <h1 className="mb-2 text-2xl font-bold">Keep going!</h1>
         <p className="mb-6 text-slate-600">

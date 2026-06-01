@@ -12,7 +12,8 @@ import {
   useTrackProgress,
   type GrammarResult,
 } from "@/lib/store";
-import { speak, stopSpeaking } from "@/lib/tts";
+import { speak, stopSpeaking, useIsSpeaking } from "@/lib/tts";
+import { TutorAvatar, type AvatarState } from "./TutorAvatar";
 
 function uid() {
   return Math.random().toString(36).slice(2, 10);
@@ -35,6 +36,17 @@ export function PracticeRoom() {
   const markLessonComplete = useTrackProgress((s) => s.markLessonComplete);
 
   const starterSeededRef = useRef(false);
+  const [micStatus, setMicStatus] = useState<"idle" | "requesting" | "recording" | "processing" | "error">("idle");
+  const isSpeaking = useIsSpeaking();
+
+  const lastMessage = messages[messages.length - 1];
+  const isReplyStreaming = lastMessage?.role === "assistant" && lastMessage?.streaming;
+  const isTranscribing = micStatus === "processing";
+
+  let avatarState: AvatarState = "idle";
+  if (micStatus === "recording") avatarState = "listening";
+  else if (isTranscribing || isReplyStreaming) avatarState = "thinking";
+  else if (isSpeaking) avatarState = "speaking";
 
   useEffect(() => {
     if (!sessionStartedAt) startSession();
@@ -262,8 +274,11 @@ export function PracticeRoom() {
         </div>
       </div>
 
-      <div className="border-t border-slate-200 bg-white px-4 py-6">
-        <MicButton onAudioReady={handleAudio} />
+      <div className="border-t border-slate-200 bg-white px-4 py-5">
+        <div className="mx-auto flex max-w-3xl flex-col items-center gap-4">
+          <TutorAvatar state={avatarState} size={96} name="Maya — your tutor" />
+          <MicButton onAudioReady={handleAudio} onStatusChange={setMicStatus} />
+        </div>
       </div>
     </div>
   );

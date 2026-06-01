@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mic, MessageCircle, Sparkles, Globe } from "lucide-react";
+import { Mic, MessageCircle, Heart, Compass } from "lucide-react";
 import { ShareButton } from "@/components/ShareButton";
 
 export default function LandingPage() {
@@ -47,12 +47,12 @@ export default function LandingPage() {
             body="See which words to work on with a clear 0–100 score per utterance."
           />
           <Feature
-            icon={<Sparkles className="h-6 w-6" />}
+            icon={<Heart className="h-6 w-6" />}
             title="Grammar fixes"
             body="Gentle corrections after every message so you learn while you talk."
           />
           <Feature
-            icon={<Globe className="h-6 w-6" />}
+            icon={<Compass className="h-6 w-6" />}
             title="Scenarios"
             body="Practice job interviews, ordering food, meetings, airports, and more."
           />

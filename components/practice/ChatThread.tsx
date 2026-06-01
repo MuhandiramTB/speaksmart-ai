@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useSessionStore, useSettings, type Message } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import {
-  Sparkles,
+  GraduationCap,
   User,
   CheckCircle2,
   AlertCircle,
@@ -47,7 +47,7 @@ function MessageBubble({ message: m }: { message: Message }) {
     return (
       <div className="flex gap-3 justify-start">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700">
-          <Sparkles className="h-4 w-4" />
+          <GraduationCap className="h-4 w-4" />
         </div>
         <div className="max-w-[75%] rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm leading-relaxed text-slate-800 shadow-sm">
           {m.content}

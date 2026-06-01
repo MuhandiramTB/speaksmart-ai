@@ -10,15 +10,22 @@ type Status = "idle" | "requesting" | "recording" | "processing" | "error";
 export function MicButton({
   onAudioReady,
   disabled,
+  onStatusChange,
 }: {
   onAudioReady: (blob: Blob, mimeType: string) => void | Promise<void>;
   disabled?: boolean;
+  onStatusChange?: (status: Status) => void;
 }) {
-  const [status, setStatus] = useState<Status>("idle");
+  const [status, setStatusInternal] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
+
+  const setStatus = (s: Status) => {
+    setStatusInternal(s);
+    onStatusChange?.(s);
+  };
 
   useEffect(() => {
     return () => {

@@ -6,6 +6,7 @@ import { useSessionStore } from "@/lib/store";
 import { ArrowLeft, Settings as SettingsIcon, BarChart3 } from "lucide-react";
 import { OnboardingOverlay } from "@/components/OnboardingOverlay";
 import { TrackPicker } from "./TrackPicker";
+import { ScenarioIcon } from "./ScenarioIcon";
 
 export function ScenarioPicker() {
   const setScenario = useSessionStore((s) => s.setScenario);
@@ -52,7 +53,9 @@ export function ScenarioPicker() {
                 onClick={() => setScenario(s)}
                 className="group rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md"
               >
-                <div className="mb-2 text-3xl">{s.emoji}</div>
+                <div className="mb-3">
+                  <ScenarioIcon id={s.id} className="h-14 w-14" />
+                </div>
                 <h3 className="text-base font-semibold text-slate-900 group-hover:text-brand-700">
                   {s.title}
                 </h3>

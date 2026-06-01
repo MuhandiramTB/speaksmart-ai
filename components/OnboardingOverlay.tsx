@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Mic, Sparkles, BarChart3, X } from "lucide-react";
+import { Mic, Lightbulb, BarChart3, X } from "lucide-react";
 import { useSettings } from "@/lib/store";
 
 const STEPS = [
@@ -11,7 +11,7 @@ const STEPS = [
     body: "Hold a real conversation in English — the AI listens patiently and replies.",
   },
   {
-    icon: <Sparkles className="h-6 w-6" />,
+    icon: <Lightbulb className="h-6 w-6" />,
     title: "Get instant feedback",
     body: "See your pronunciation score per utterance and gentle grammar fixes.",
   },

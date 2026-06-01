@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { TRACKS, type TrackLesson, type LearningTrack } from "@/lib/tracks";
 import { useSessionStore, useSettings, useTrackProgress, type ActiveLesson } from "@/lib/store";
-import { CheckCircle2, Flame, Sparkles } from "lucide-react";
+import { CheckCircle2, Flame, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function TrackPicker() {
@@ -142,7 +142,7 @@ function LessonRow({
             <div className="text-xs text-slate-500">{lesson.description}</div>
           </div>
         </div>
-        <Sparkles className="h-4 w-4 text-slate-400 transition group-hover:text-brand-600" />
+        <ChevronRight className="h-4 w-4 text-slate-400 transition group-hover:text-brand-600" />
       </button>
     </li>
   );
