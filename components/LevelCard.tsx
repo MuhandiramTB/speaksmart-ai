@@ -1,17 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLevel } from "@/lib/store";
-import { progressWithinLevel, LEVELS } from "@/lib/level";
-import { TrendingUp, Sparkles, RotateCcw } from "lucide-react";
+import { progressWithinLevel, LEVELS, levelFromScore } from "@/lib/level";
+import { TrendingUp, Sparkles, RotateCcw, PartyPopper } from "lucide-react";
+import { Confetti } from "@/components/Confetti";
 
 export function LevelCard({ compact = false }: { compact?: boolean }) {
   const mastery = useLevel((s) => s.mastery);
   const hasTaken = useLevel((s) => s.hasTakenAssessment);
   const history = useLevel((s) => s.history);
   const [mounted, setMounted] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const lastLevelRef = useRef<string | null>(null);
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!mounted || !hasTaken) return;
+    const currentCode = levelFromScore(mastery).code;
+    if (lastLevelRef.current && lastLevelRef.current !== currentCode) {
+      const wasIdx = LEVELS.findIndex((l) => l.code === lastLevelRef.current);
+      const nowIdx = LEVELS.findIndex((l) => l.code === currentCode);
+      if (nowIdx > wasIdx) setShowConfetti(true);
+    }
+    lastLevelRef.current = currentCode;
+  }, [mastery, mounted, hasTaken]);
 
   if (!mounted) return <div className="h-32 animate-pulse rounded-2xl bg-slate-100" />;
 
@@ -63,7 +77,14 @@ export function LevelCard({ compact = false }: { compact?: boolean }) {
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="relative rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <Confetti show={showConfetti} />
+      {showConfetti && (
+        <div className="absolute -top-3 right-4 inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 shadow">
+          <PartyPopper className="h-3.5 w-3.5" />
+          Level up!
+        </div>
+      )}
       <div className="mb-4 flex items-start justify-between gap-4">
         <div className="flex items-center gap-4">
           <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 text-3xl">

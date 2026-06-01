@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { SCENARIOS } from "@/lib/scenarios";
 import { useSessionStore } from "@/lib/store";
 import { ArrowLeft, Settings as SettingsIcon, BarChart3 } from "lucide-react";
@@ -51,11 +52,16 @@ export function ScenarioPicker() {
           <h2 className="mb-1 text-2xl font-bold text-slate-900">Free practice</h2>
           <p className="mb-5 text-slate-600">Pick a scenario and chat freely — no daily plan.</p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {SCENARIOS.map((s) => (
-              <button
+            {SCENARIOS.map((s, i) => (
+              <motion.button
                 key={s.id}
                 onClick={() => setScenario(s)}
-                className="group rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.04 * i, type: "spring", stiffness: 200, damping: 18 }}
+                whileHover={{ y: -3 }}
+                whileTap={{ scale: 0.97 }}
+                className="group rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm hover:border-brand-300 hover:shadow-md"
               >
                 <div className="mb-3">
                   <ScenarioIcon id={s.id} className="h-14 w-14" />
@@ -64,7 +70,7 @@ export function ScenarioPicker() {
                   {s.title}
                 </h3>
                 <p className="mt-1 text-sm text-slate-600">{s.description}</p>
-              </button>
+              </motion.button>
             ))}
           </div>
         </section>

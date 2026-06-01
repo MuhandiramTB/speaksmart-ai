@@ -15,7 +15,7 @@ import {
 } from "@/lib/store";
 import { utteranceMastery, sessionMastery } from "@/lib/level";
 import { speak, stopSpeaking, useIsSpeaking } from "@/lib/tts";
-import { TutorAvatar, type AvatarState } from "./TutorAvatar";
+import { TutorAvatar, type AvatarState, type AvatarMood } from "./TutorAvatar";
 
 function uid() {
   return Math.random().toString(36).slice(2, 10);
@@ -50,6 +50,16 @@ export function PracticeRoom() {
   if (micStatus === "recording") avatarState = "listening";
   else if (isTranscribing || isReplyStreaming) avatarState = "thinking";
   else if (isSpeaking) avatarState = "speaking";
+
+  // Mood derived from recent performance — happy on success, concerned on repeat mistakes
+  const lastUserMsg = [...messages].reverse().find((m) => m.role === "user" && !m.pending);
+  let avatarMood: AvatarMood = "neutral";
+  if (lastUserMsg) {
+    const score = lastUserMsg.pronunciationScore ?? 0;
+    const grammarGood = lastUserMsg.grammar?.isCorrect ?? true;
+    if (score >= 80 && grammarGood) avatarMood = "happy";
+    else if (score < 50 || !grammarGood) avatarMood = "concerned";
+  }
 
   useEffect(() => {
     if (!sessionStartedAt) startSession();
@@ -296,7 +306,7 @@ export function PracticeRoom() {
 
       <div className="border-t border-slate-200 bg-white px-4 py-5">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-4">
-          <TutorAvatar state={avatarState} size={96} name="Maya — your tutor" />
+          <TutorAvatar state={avatarState} mood={avatarMood} size={96} name="Maya — your tutor" />
           <MicButton onAudioReady={handleAudio} onStatusChange={setMicStatus} />
         </div>
       </div>

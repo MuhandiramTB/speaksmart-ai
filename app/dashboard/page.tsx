@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Flame, Clock, MessageCircleHeart, Trophy, Trash2, BookOpen, Target } from "lucide-react";
+import { motion } from "framer-motion";
 import { useHistory, useCorrections, type PastSession } from "@/lib/store";
 import { LevelCard } from "@/components/LevelCard";
 
@@ -63,26 +64,31 @@ export default function DashboardPage() {
 
         <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard
+            index={0}
             icon={<Clock className="h-5 w-5" />}
             label="Total practice"
             value={`${totalMinutes} min`}
           />
           <StatCard
+            index={1}
             icon={<Trophy className="h-5 w-5" />}
             label="Pronunciation (7d)"
             value={`${avg7}/100`}
           />
           <StatCard
+            index={2}
             icon={<MessageCircleHeart className="h-5 w-5" />}
             label="Grammar / 100 words"
             value={`${grammarPer100}`}
           />
           <StatCard
+            index={3}
             icon={<Flame className="h-5 w-5" />}
             label="Streak"
             value={`${streak} day${streak === 1 ? "" : "s"}`}
           />
           <StatCard
+            index={4}
             icon={<Target className="h-5 w-5" />}
             label="Mistakes mastered"
             value={`${correctionsMastered}`}
@@ -127,19 +133,26 @@ function StatCard({
   icon,
   label,
   value,
+  index = 0,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
+  index?: number;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.05 * index, type: "spring", stiffness: 200, damping: 18 }}
+      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+    >
       <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-brand-700">
         {icon}
       </div>
       <div className="text-2xl font-bold text-slate-900">{value}</div>
       <div className="mt-1 text-xs text-slate-500">{label}</div>
-    </div>
+    </motion.div>
   );
 }
 
