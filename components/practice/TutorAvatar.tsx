@@ -2,17 +2,35 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import type { TutorPreset } from "@/lib/tutors";
 
 export type AvatarState = "idle" | "listening" | "thinking" | "speaking";
 export type AvatarMood = "neutral" | "happy" | "concerned";
 
+const SKIN_GRADIENT: Record<string, string> = {
+  light: "from-amber-50 to-amber-100",
+  tan: "from-amber-100 to-amber-200",
+  medium: "from-amber-200 to-orange-300",
+  deep: "from-amber-700 to-amber-900",
+};
+
+const HAIR_COLOR: Record<string, string> = {
+  black: "from-slate-900 to-slate-800",
+  brown: "from-amber-900 to-amber-800",
+  blonde: "from-amber-300 to-amber-400",
+  auburn: "from-orange-700 to-rose-800",
+  gray: "from-slate-400 to-slate-500",
+};
+
 export function TutorAvatar({
+  tutor,
   state = "idle",
   mood = "neutral",
   size = 120,
   name,
   trackCursor = true,
 }: {
+  tutor: TutorPreset;
   state?: AvatarState;
   mood?: AvatarMood;
   size?: number;
@@ -47,16 +65,18 @@ export function TutorAvatar({
     return () => window.removeEventListener("mousemove", onMove);
   }, [trackCursor, state]);
 
+  const skinGrad = SKIN_GRADIENT[tutor.appearance.skin];
+  const hairGrad = HAIR_COLOR[tutor.appearance.hairColor];
+
   return (
     <div className="flex flex-col items-center gap-2 select-none">
       <div
         ref={containerRef}
         className="relative transition-transform duration-300"
         style={{ width: size, height: size }}
-        aria-label={`Tutor — ${state}`}
+        aria-label={`Tutor ${tutor.name} — ${state}`}
         role="img"
       >
-        {/* Soft glow ring while listening */}
         {state === "listening" && (
           <>
             <span className="absolute inset-0 rounded-full bg-rose-300/50 animate-tutorPing" />
@@ -67,20 +87,21 @@ export function TutorAvatar({
           <span className="absolute inset-0 rounded-full bg-brand-300/40 animate-tutorPing" />
         )}
 
-        {/* Face */}
         <div
           className={cn(
             "relative h-full w-full overflow-hidden rounded-full shadow-lg ring-4 ring-white",
-            "bg-gradient-to-b from-amber-100 to-amber-200",
+            "bg-gradient-to-b",
+            skinGrad,
             "transition-all duration-300",
             state === "idle" && "animate-tutorBreathe",
             state === "thinking" && "rotate-[-3deg]"
           )}
         >
           {/* Hair */}
-          <div className="absolute -top-1 left-1/2 h-[42%] w-[88%] -translate-x-1/2 rounded-[50%] bg-gradient-to-b from-slate-800 to-slate-700" />
-          {/* Bangs */}
-          <div className="absolute top-[14%] left-1/2 h-[18%] w-[70%] -translate-x-1/2 rounded-[40%_40%_60%_60%] bg-slate-800" />
+          <Hair
+            style={tutor.appearance.hairStyle}
+            gradient={hairGrad}
+          />
 
           {/* Eyebrows */}
           <Eyebrow side="left" mood={mood} state={state} />
@@ -89,6 +110,9 @@ export function TutorAvatar({
           {/* Eyes */}
           <Eye side="left" state={state} pupilOffset={pupilOffset} />
           <Eye side="right" state={state} pupilOffset={pupilOffset} />
+
+          {/* Glasses */}
+          {tutor.appearance.accessory === "glasses" && <Glasses />}
 
           {/* Cheeks */}
           <span
@@ -104,10 +128,13 @@ export function TutorAvatar({
             )}
           />
 
+          {/* Earrings */}
+          {tutor.appearance.accessory === "earrings" && <Earrings />}
+
           {/* Mouth */}
           <Mouth state={state} mood={mood} />
 
-          {/* Thinking dots near head */}
+          {/* Thinking dots */}
           {state === "thinking" && (
             <div className="absolute -top-3 right-2 flex gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-slate-600 animate-tutorBob" />
@@ -127,6 +154,116 @@ export function TutorAvatar({
       )}
     </div>
   );
+}
+
+function Hair({ style, gradient }: { style: string; gradient: string }) {
+  switch (style) {
+    case "short":
+      return (
+        <div
+          className={cn(
+            "absolute -top-1 left-1/2 h-[34%] w-[88%] -translate-x-1/2 rounded-[50%] bg-gradient-to-b",
+            gradient
+          )}
+        />
+      );
+    case "bun":
+      return (
+        <>
+          <div
+            className={cn(
+              "absolute -top-3 left-1/2 h-[20%] w-[40%] -translate-x-1/2 rounded-full bg-gradient-to-b",
+              gradient
+            )}
+          />
+          <div
+            className={cn(
+              "absolute -top-0.5 left-1/2 h-[28%] w-[80%] -translate-x-1/2 rounded-[50%] bg-gradient-to-b",
+              gradient
+            )}
+          />
+        </>
+      );
+    case "curly":
+      return (
+        <>
+          <div
+            className={cn(
+              "absolute -top-2 left-1/2 h-[44%] w-[100%] -translate-x-1/2 rounded-full bg-gradient-to-b",
+              gradient
+            )}
+          />
+          <div
+            className={cn(
+              "absolute -top-1 -left-1 h-[18%] w-[18%] rounded-full bg-gradient-to-b",
+              gradient
+            )}
+          />
+          <div
+            className={cn(
+              "absolute -top-1 -right-1 h-[18%] w-[18%] rounded-full bg-gradient-to-b",
+              gradient
+            )}
+          />
+        </>
+      );
+    case "buzz":
+      return (
+        <div
+          className={cn(
+            "absolute top-[6%] left-1/2 h-[22%] w-[78%] -translate-x-1/2 rounded-[50%] bg-gradient-to-b opacity-90",
+            gradient
+          )}
+        />
+      );
+    case "wavy":
+      return (
+        <>
+          <div
+            className={cn(
+              "absolute -top-1 left-1/2 h-[40%] w-[92%] -translate-x-1/2 rounded-[60%_40%_50%_50%] bg-gradient-to-b",
+              gradient
+            )}
+          />
+          <div
+            className={cn(
+              "absolute top-[28%] -left-2 h-[26%] w-[22%] rounded-[50%] bg-gradient-to-b",
+              gradient
+            )}
+          />
+        </>
+      );
+    case "long":
+    default:
+      return (
+        <>
+          <div
+            className={cn(
+              "absolute -top-1 left-1/2 h-[42%] w-[88%] -translate-x-1/2 rounded-[50%] bg-gradient-to-b",
+              gradient
+            )}
+          />
+          <div
+            className={cn(
+              "absolute top-[14%] left-1/2 h-[18%] w-[70%] -translate-x-1/2 rounded-[40%_40%_60%_60%] bg-gradient-to-b",
+              gradient
+            )}
+          />
+          <div
+            className={cn(
+              "absolute top-[30%] -left-1 h-[40%] w-[18%] rounded-[50%] bg-gradient-to-b",
+              gradient
+            )}
+          />
+          <div
+            className={cn(
+              "absolute top-[30%] -right-1 h-[40%] w-[18%] rounded-[50%] bg-gradient-to-b",
+              gradient
+            )}
+          />
+        </>
+      );
+  }
 }
 
 function Eyebrow({
@@ -192,6 +329,25 @@ function Eye({
   );
 }
 
+function Glasses() {
+  return (
+    <>
+      <span className="absolute top-[44%] left-[22%] h-[10%] w-[18%] rounded-[40%] border-[2px] border-slate-900" />
+      <span className="absolute top-[44%] right-[22%] h-[10%] w-[18%] rounded-[40%] border-[2px] border-slate-900" />
+      <span className="absolute top-[47%] left-[40%] h-[2%] w-[5%] bg-slate-900" />
+    </>
+  );
+}
+
+function Earrings() {
+  return (
+    <>
+      <span className="absolute top-[62%] left-[6%] h-[5%] w-[5%] rounded-full bg-amber-400 shadow" />
+      <span className="absolute top-[62%] right-[6%] h-[5%] w-[5%] rounded-full bg-amber-400 shadow" />
+    </>
+  );
+}
+
 function Mouth({ state, mood }: { state: AvatarState; mood: AvatarMood }) {
   if (state === "speaking") {
     return (
@@ -203,7 +359,6 @@ function Mouth({ state, mood }: { state: AvatarState; mood: AvatarMood }) {
       <div className="absolute left-1/2 top-[76%] h-[6%] w-[26%] -translate-x-1/2 rounded-full bg-slate-900" />
     );
   }
-  // Smile / neutral / concerned
   const isHappy = mood === "happy";
   const isConcerned = mood === "concerned";
   return (
@@ -212,10 +367,10 @@ function Mouth({ state, mood }: { state: AvatarState; mood: AvatarMood }) {
         className={cn(
           "absolute inset-x-0 h-[200%] rounded-[50%] transition-all duration-300",
           isConcerned
-            ? "top-1 border-t-[3px] border-slate-900" // frown
+            ? "top-1 border-t-[3px] border-slate-900"
             : isHappy
-            ? "-top-1.5 border-b-[3px] border-slate-900" // bigger smile
-            : "-top-1 border-b-[3px] border-slate-900" // gentle smile
+            ? "-top-1.5 border-b-[3px] border-slate-900"
+            : "-top-1 border-b-[3px] border-slate-900"
         )}
       />
     </div>

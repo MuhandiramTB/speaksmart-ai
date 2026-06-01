@@ -29,7 +29,7 @@ const BEGINNER_LESSONS: TrackLesson[] = [
     goal: "By the end you can confidently introduce yourself and exchange greetings.",
     rolePrompt:
       "a friendly stranger meeting the student for the first time at a community event. Speak slowly and simply, using only beginner-level vocabulary. After every learner reply, gently invite them to use a new greeting or self-introduction phrase. Keep your sentences under 8 words",
-    starterLine: "Hi there! Welcome. My name is Maya. What's your name?",
+    starterLine: "Hi there! Welcome. It's nice to meet you. What's your name?",
     examples: [
       "Hello! My name is Sam.",
       "Nice to meet you.",

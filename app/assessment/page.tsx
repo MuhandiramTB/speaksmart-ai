@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, RotateCcw, CheckCircle2 } from "lucide-react";
 import { MicButton } from "@/components/practice/MicButton";
 import { TutorAvatar, type AvatarState } from "@/components/practice/TutorAvatar";
+import { getTutor } from "@/lib/tutors";
 import { speak, stopSpeaking, useIsSpeaking } from "@/lib/tts";
 import { useLevel, useSettings } from "@/lib/store";
 import { ASSESSMENT_QUESTIONS, levelFromScore } from "@/lib/level";
@@ -29,6 +30,8 @@ export default function AssessmentPage() {
   const isSpeaking = useIsSpeaking();
   const voiceName = useSettings((s) => s.voiceName);
   const ttsMuted = useSettings((s) => s.ttsMuted);
+  const tutorId = useSettings((s) => s.tutorId);
+  const tutor = getTutor(tutorId);
   const setFromAssessment = useLevel((s) => s.setFromAssessment);
   const resetLevel = useLevel((s) => s.reset);
 
@@ -142,12 +145,12 @@ export default function AssessmentPage() {
       </header>
 
       <main className="mx-auto max-w-2xl px-6 py-10">
-        {phase === "intro" && <Intro onStart={() => setPhase("ask")} />}
+        {phase === "intro" && <Intro tutorName={tutor.name} tutorId={tutorId} onStart={() => setPhase("ask")} />}
 
         {phase !== "intro" && phase !== "done" && (
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="mb-6 flex flex-col items-center gap-2">
-              <TutorAvatar state={avatarState} size={80} />
+              <TutorAvatar tutor={tutor} state={avatarState} size={80} />
             </div>
 
             {phase === "ask" && (
@@ -205,16 +208,25 @@ export default function AssessmentPage() {
   );
 }
 
-function Intro({ onStart }: { onStart: () => void }) {
+function Intro({
+  tutorName,
+  tutorId,
+  onStart,
+}: {
+  tutorName: string;
+  tutorId: string;
+  onStart: () => void;
+}) {
+  const tutor = getTutor(tutorId);
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
       <div className="mb-4 flex justify-center">
-        <TutorAvatar state="idle" size={96} />
+        <TutorAvatar tutor={tutor} state="idle" size={96} />
       </div>
       <h1 className="mb-2 text-2xl font-bold">Find your English level</h1>
       <p className="mb-6 text-slate-600">
-        Maya will ask you 6 short spoken questions. It takes about 5 minutes. At the end you&apos;ll get your
-        CEFR level (A1 to C1) and a personal practice plan.
+        {tutorName} will ask you 6 short spoken questions. It takes about 5 minutes. At the end
+        you&apos;ll get your CEFR level (A1 to C1) and a personal practice plan.
       </p>
       <button
         type="button"

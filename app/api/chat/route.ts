@@ -10,6 +10,7 @@ type ChatBody = {
   scenarioId: string;
   level?: "beginner" | "intermediate" | "advanced";
   accent?: "US" | "UK" | "AU";
+  tutorId?: string;
   messages: { role: "user" | "assistant"; content: string }[];
 };
 
@@ -20,6 +21,7 @@ export async function POST(req: NextRequest) {
     scenario,
     level: body.level,
     accent: body.accent,
+    tutorId: body.tutorId,
   });
 
   const stream = await getGroq().chat.completions.create({

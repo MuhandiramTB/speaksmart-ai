@@ -6,6 +6,7 @@ import { SCENARIOS } from "@/lib/scenarios";
 import { useSessionStore } from "@/lib/store";
 import { ArrowLeft, Settings as SettingsIcon, BarChart3 } from "lucide-react";
 import { OnboardingOverlay } from "@/components/OnboardingOverlay";
+import { FirstTimeTutorPrompt } from "@/components/FirstTimeTutorPrompt";
 import { TrackPicker } from "./TrackPicker";
 import { ScenarioIcon } from "./ScenarioIcon";
 import { LevelCard } from "@/components/LevelCard";
@@ -16,6 +17,7 @@ export function ScenarioPicker() {
   return (
     <div className="min-h-screen bg-slate-50">
       <OnboardingOverlay />
+      <FirstTimeTutorPrompt />
       <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3">
         <Link
           href="/"

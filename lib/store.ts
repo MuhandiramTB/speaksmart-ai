@@ -78,11 +78,14 @@ type Settings = {
   voiceName: string | null;
   ttsMuted: boolean;
   hasSeenOnboarding: boolean;
+  tutorId: string;
+  hasPickedTutor: boolean;
   setLevel: (v: Level) => void;
   setAccent: (v: Accent) => void;
   setVoiceName: (v: string | null) => void;
   toggleTtsMute: () => void;
   markOnboardingSeen: () => void;
+  setTutor: (id: string) => void;
 };
 
 export const useSettings = create<Settings>()(
@@ -93,11 +96,14 @@ export const useSettings = create<Settings>()(
       voiceName: null,
       ttsMuted: false,
       hasSeenOnboarding: false,
+      tutorId: "maya",
+      hasPickedTutor: false,
       setLevel: (level) => set({ level }),
       setAccent: (accent) => set({ accent }),
       setVoiceName: (voiceName) => set({ voiceName }),
       toggleTtsMute: () => set((s) => ({ ttsMuted: !s.ttsMuted })),
       markOnboardingSeen: () => set({ hasSeenOnboarding: true }),
+      setTutor: (tutorId) => set({ tutorId, hasPickedTutor: true }),
     }),
     { name: "speaksmart-settings" }
   )

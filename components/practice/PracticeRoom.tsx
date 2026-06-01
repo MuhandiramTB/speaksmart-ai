@@ -16,6 +16,7 @@ import {
 import { utteranceMastery, sessionMastery } from "@/lib/level";
 import { speak, stopSpeaking, useIsSpeaking } from "@/lib/tts";
 import { TutorAvatar, type AvatarState, type AvatarMood } from "./TutorAvatar";
+import { getTutor } from "@/lib/tutors";
 
 function uid() {
   return Math.random().toString(36).slice(2, 10);
@@ -33,7 +34,8 @@ export function PracticeRoom() {
   const endSession = useSessionStore((s) => s.endSession);
   const setScenario = useSessionStore((s) => s.setScenario);
 
-  const { level, accent, voiceName, ttsMuted, toggleTtsMute } = useSettings();
+  const { level, accent, voiceName, ttsMuted, toggleTtsMute, tutorId } = useSettings();
+  const tutor = getTutor(tutorId);
   const addPastSession = useHistory((s) => s.addSession);
   const markLessonComplete = useTrackProgress((s) => s.markLessonComplete);
   const updateLevelFromSession = useLevel((s) => s.updateFromSession);
@@ -75,7 +77,11 @@ export function PracticeRoom() {
       content: activeLesson.starterLine,
       createdAt: Date.now(),
     });
-    if (!ttsMuted) speak(activeLesson.starterLine, { voiceName: voiceName ?? undefined });
+    if (!ttsMuted)
+      speak(activeLesson.starterLine, {
+        voiceName: voiceName ?? undefined,
+        voiceHints: tutor.voiceHints,
+      });
   }, [activeLesson, messages.length, addMessage, ttsMuted, voiceName]);
 
   const finishAndExit = useCallback(() => {
@@ -193,6 +199,7 @@ export function PracticeRoom() {
             messages: history,
             level,
             accent,
+            tutorId,
           }),
         });
         if (!chatRes.ok || !chatRes.body) {
@@ -231,7 +238,8 @@ export function PracticeRoom() {
       })();
 
       const [acc] = await Promise.all([chatPromise, grammarPromise]);
-      if (!ttsMuted && acc) speak(acc, { voiceName: voiceName ?? undefined });
+      if (!ttsMuted && acc)
+        speak(acc, { voiceName: voiceName ?? undefined, voiceHints: tutor.voiceHints });
     },
     [
       scenario,
@@ -243,6 +251,8 @@ export function PracticeRoom() {
       voiceName,
       level,
       accent,
+      tutorId,
+      tutor,
     ]
   );
 
@@ -306,7 +316,7 @@ export function PracticeRoom() {
 
       <div className="border-t border-slate-200 bg-white px-4 py-5">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-4">
-          <TutorAvatar state={avatarState} mood={avatarMood} size={96} name="Maya — your tutor" />
+          <TutorAvatar tutor={tutor} state={avatarState} mood={avatarMood} size={96} name={`${tutor.name} — your tutor`} />
           <MicButton onAudioReady={handleAudio} onStatusChange={setMicStatus} />
         </div>
       </div>

@@ -6,6 +6,7 @@ import { getMicStream, pickMimeType } from "@/lib/audio";
 import { speak, useIsSpeaking } from "@/lib/tts";
 import { similarityScore, PASS_THRESHOLD } from "@/lib/similarity";
 import { useSettings, useCorrections } from "@/lib/store";
+import { getTutor } from "@/lib/tutors";
 import { cn } from "@/lib/utils";
 
 const MAX_ATTEMPTS = 3;
@@ -17,6 +18,8 @@ type Phase = "idle" | "recording" | "processing" | "result";
 export function PracticeCorrection({ target }: { target: string }) {
   const voiceName = useSettings((s) => s.voiceName);
   const ttsMuted = useSettings((s) => s.ttsMuted);
+  const tutorId = useSettings((s) => s.tutorId);
+  const tutor = getTutor(tutorId);
   const isSpeaking = useIsSpeaking();
   const recordMastered = useCorrections((s) => s.recordMastered);
   const recordSkipped = useCorrections((s) => s.recordSkipped);
@@ -39,7 +42,12 @@ export function PracticeCorrection({ target }: { target: string }) {
   const exhausted = failedTries >= MAX_ATTEMPTS && !passed;
 
   function playTarget() {
-    if (!ttsMuted) speak(target, { voiceName: voiceName ?? undefined, rate: 0.9 });
+    if (!ttsMuted)
+      speak(target, {
+        voiceName: voiceName ?? undefined,
+        voiceHints: tutor.voiceHints,
+        rate: 0.9,
+      });
   }
 
   async function startRecording() {
@@ -133,7 +141,7 @@ export function PracticeCorrection({ target }: { target: string }) {
     <div className="rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
         <div className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
-          Repeat after Maya
+          Repeat after {tutor.name}
         </div>
         <button
           type="button"

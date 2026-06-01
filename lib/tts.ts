@@ -24,17 +24,32 @@ export function useIsSpeaking(): boolean {
   );
 }
 
-export function speak(text: string, opts?: { voiceName?: string; rate?: number }) {
+export function speak(
+  text: string,
+  opts?: { voiceName?: string; voiceHints?: string[]; rate?: number }
+) {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.rate = opts?.rate ?? 1;
+  const voices = window.speechSynthesis.getVoices();
+  let voice: SpeechSynthesisVoice | undefined;
   if (opts?.voiceName) {
-    const voice = window.speechSynthesis.getVoices().find((v) => v.name === opts.voiceName);
-    if (voice) utterance.voice = voice;
-  } else {
-    const enVoice = window.speechSynthesis.getVoices().find((v) => v.lang.startsWith("en"));
-    if (enVoice) utterance.voice = enVoice;
+    voice = voices.find((v) => v.name === opts.voiceName);
   }
+  if (!voice && opts?.voiceHints) {
+    const en = voices.filter((v) => v.lang.startsWith("en"));
+    for (const hint of opts.voiceHints) {
+      const found = en.find((v) => v.name.toLowerCase().includes(hint.toLowerCase()));
+      if (found) {
+        voice = found;
+        break;
+      }
+    }
+  }
+  if (!voice) {
+    voice = voices.find((v) => v.lang.startsWith("en"));
+  }
+  if (voice) utterance.voice = voice;
   utterance.onstart = () => setSpeaking(true);
   utterance.onend = () => setSpeaking(false);
   utterance.onerror = () => setSpeaking(false);

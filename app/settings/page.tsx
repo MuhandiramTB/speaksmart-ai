@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Volume2 } from "lucide-react";
 import { useSettings, type Accent, type Level } from "@/lib/store";
 import { speak } from "@/lib/tts";
+import { TutorPicker } from "@/components/TutorPicker";
 
 const LEVELS: { id: Level; label: string; description: string }[] = [
   { id: "beginner", label: "Beginner", description: "Simple words, slow replies." },
@@ -49,6 +50,10 @@ export default function SettingsPage() {
       </header>
 
       <main className="mx-auto max-w-2xl px-6 py-8">
+        <Section title="Your tutor" subtitle="Pick the personality and voice you like best.">
+          <TutorPicker showHeader={false} />
+        </Section>
+
         <Section title="Your level" subtitle="The AI adjusts vocabulary and speed.">
           <div className="grid gap-3 sm:grid-cols-3">
             {LEVELS.map((l) => (
