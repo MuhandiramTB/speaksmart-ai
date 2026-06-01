@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Flame, Mic, MessageSquare, Award, Trash2 } from "lucide-react";
+import { ArrowLeft, Flame, Mic, MessageSquare, Award, Trash2, BookOpen } from "lucide-react";
 import { useHistory, type PastSession } from "@/lib/store";
 
 export default function DashboardPage() {
@@ -80,6 +80,8 @@ export default function DashboardPage() {
 
         <Chart sessions={sessions.slice(0, 14).reverse()} />
 
+        <MistakePatterns sessions={sessions} />
+
         <h2 className="mt-10 mb-3 text-lg font-semibold">Recent sessions</h2>
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <table className="w-full text-sm">
@@ -151,6 +153,64 @@ function Chart({ sessions }: { sessions: PastSession[] }) {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function MistakePatterns({ sessions }: { sessions: PastSession[] }) {
+  const tally = new Map<string, number>();
+  for (const s of sessions) {
+    for (const t of s.mistakeTypes ?? []) {
+      tally.set(t, (tally.get(t) ?? 0) + 1);
+    }
+  }
+  const sorted = Array.from(tally.entries()).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const total = sorted.reduce((acc, [, n]) => acc + n, 0);
+
+  if (sorted.length === 0) {
+    return (
+      <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
+        <div className="flex items-center gap-2 text-emerald-800">
+          <BookOpen className="h-5 w-5" />
+          <h2 className="text-base font-semibold">No grammar mistakes tracked yet</h2>
+        </div>
+        <p className="mt-2 text-sm text-emerald-700">
+          Great job — keep practicing and we&apos;ll show patterns here as they appear.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mb-1 flex items-center gap-2">
+        <BookOpen className="h-5 w-5 text-amber-700" />
+        <h2 className="text-base font-semibold">What to work on</h2>
+      </div>
+      <p className="mb-4 text-xs text-slate-500">
+        Your most common mistake types — focus practice here to improve fastest.
+      </p>
+      <ul className="space-y-3">
+        {sorted.map(([type, count]) => {
+          const pct = Math.round((count / total) * 100);
+          return (
+            <li key={type}>
+              <div className="mb-1 flex items-center justify-between text-sm">
+                <span className="font-medium text-slate-900">{type}</span>
+                <span className="text-slate-500">
+                  {count} time{count === 1 ? "" : "s"} · {pct}%
+                </span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-600"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }

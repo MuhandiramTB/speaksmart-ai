@@ -3,7 +3,16 @@
 import { useEffect, useRef } from "react";
 import { useSessionStore, useSettings, type Message } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { Sparkles, User, CheckCircle2, AlertCircle, Volume2 } from "lucide-react";
+import {
+  Sparkles,
+  User,
+  CheckCircle2,
+  AlertCircle,
+  Volume2,
+  BookOpen,
+  Lightbulb,
+  Play,
+} from "lucide-react";
 import { speak } from "@/lib/tts";
 
 export function ChatThread() {
@@ -53,7 +62,7 @@ function MessageBubble({ message: m }: { message: Message }) {
 
   return (
     <div className="flex gap-3 justify-end">
-      <div className="flex max-w-[75%] flex-col items-end gap-1.5">
+      <div className="flex w-full max-w-[85%] flex-col items-end gap-2">
         <div className="rounded-2xl bg-brand-600 px-4 py-2.5 text-sm leading-relaxed text-white shadow-sm">
           {m.pending ? (
             <span className="italic opacity-80">Transcribing…</span>
@@ -80,11 +89,15 @@ function MessageBubble({ message: m }: { message: Message }) {
           {!m.pending && typeof m.pronunciationScore === "number" && (
             <div className="mt-1.5 flex items-center gap-1 text-[11px] opacity-90">
               <Volume2 className="h-3 w-3" />
-              <span>Pronunciation: <span className="font-semibold">{m.pronunciationScore}/100</span></span>
+              <span>
+                Pronunciation: <span className="font-semibold">{m.pronunciationScore}/100</span>
+              </span>
             </div>
           )}
         </div>
-        {!m.pending && m.grammar && <GrammarBadge grammar={m.grammar} original={m.content} />}
+        {!m.pending && m.grammar && (
+          <TutorCard grammar={m.grammar} original={m.content} voiceName={voiceName} />
+        )}
       </div>
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-600">
         <User className="h-4 w-4" />
@@ -93,32 +106,107 @@ function MessageBubble({ message: m }: { message: Message }) {
   );
 }
 
-function GrammarBadge({
+function TutorCard({
   grammar,
   original,
+  voiceName,
 }: {
   grammar: NonNullable<Message["grammar"]>;
   original: string;
+  voiceName: string | null;
 }) {
   if (grammar.isCorrect) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700">
-        <CheckCircle2 className="h-3 w-3" />
-        Good grammar
-      </span>
+      <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-[12px] font-medium text-emerald-700">
+        <CheckCircle2 className="h-3.5 w-3.5" />
+        {grammar.encouragement || "Perfect grammar!"}
+      </div>
     );
   }
+
+  const playCorrected = () =>
+    speak(grammar.corrected, { voiceName: voiceName ?? undefined, rate: 0.9 });
+
   return (
-    <div className="w-full max-w-md rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[12px] text-amber-900">
-      <div className="mb-1 flex items-center gap-1 font-medium">
-        <AlertCircle className="h-3.5 w-3.5" />
-        Suggested phrasing
+    <div className="w-full rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-[13px] text-amber-950 shadow-sm">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="inline-flex items-center gap-1.5 font-semibold text-amber-900">
+          <AlertCircle className="h-4 w-4" />
+          Tutor feedback
+        </div>
+        {grammar.errorType && grammar.errorType !== "None" && (
+          <span className="rounded-full bg-amber-200/70 px-2.5 py-0.5 text-[11px] font-medium text-amber-900">
+            {grammar.errorType}
+          </span>
+        )}
       </div>
-      <div className="mb-1">
-        <span className="text-amber-700 line-through opacity-70">{original}</span>
+
+      <div className="mb-3 rounded-lg bg-white/70 p-3">
+        <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-amber-700">
+          You said
+        </div>
+        <div className="mb-2 text-amber-700 line-through opacity-80">{original}</div>
+        <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-emerald-700">
+          Better
+        </div>
+        <div className="flex items-start justify-between gap-2">
+          <span className="font-medium text-emerald-900">{grammar.corrected}</span>
+          <button
+            type="button"
+            onClick={playCorrected}
+            aria-label="Hear the corrected sentence"
+            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white shadow hover:bg-emerald-700"
+          >
+            <Play className="h-3 w-3" />
+          </button>
+        </div>
       </div>
-      <div className="mb-1 font-medium text-emerald-800">{grammar.corrected}</div>
-      {grammar.explanation && <div className="text-amber-800/80">{grammar.explanation}</div>}
+
+      {grammar.rule && (
+        <div className="mb-3 flex gap-2">
+          <BookOpen className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+          <div>
+            <div className="text-[11px] font-semibold uppercase tracking-wide text-amber-700">
+              The rule
+            </div>
+            <div className="text-amber-950">{grammar.rule}</div>
+          </div>
+        </div>
+      )}
+
+      {grammar.explanation && (
+        <div className="mb-3 flex gap-2">
+          <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+          <div className="text-amber-950">{grammar.explanation}</div>
+        </div>
+      )}
+
+      {grammar.examples.length > 0 && (
+        <div>
+          <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-amber-700">
+            Try these
+          </div>
+          <ul className="space-y-1.5">
+            {grammar.examples.map((ex, i) => (
+              <li key={i} className="flex items-center justify-between gap-2 rounded-md bg-white/70 px-3 py-1.5">
+                <span>{ex}</span>
+                <button
+                  type="button"
+                  onClick={() => speak(ex, { voiceName: voiceName ?? undefined, rate: 0.9 })}
+                  aria-label={`Hear: ${ex}`}
+                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-amber-700 hover:bg-amber-100"
+                >
+                  <Volume2 className="h-3.5 w-3.5" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {grammar.encouragement && (
+        <div className="mt-3 text-[12px] italic text-amber-700">{grammar.encouragement}</div>
+      )}
     </div>
   );
 }

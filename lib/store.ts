@@ -7,7 +7,11 @@ import type { Scenario } from "@/lib/scenarios";
 export type GrammarResult = {
   isCorrect: boolean;
   corrected: string;
+  errorType: string;
+  rule: string;
   explanation: string;
+  examples: string[];
+  encouragement: string;
 };
 
 export type Message = {
@@ -98,6 +102,7 @@ export type PastSession = {
   avgPronunciationScore: number;
   grammarErrorsCount: number;
   messageCount: number;
+  mistakeTypes?: string[];
 };
 
 type HistoryState = {

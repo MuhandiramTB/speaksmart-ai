@@ -41,6 +41,9 @@ export function PracticeRoom() {
     if (userMsgs.length > 0 && sessionStartedAt) {
       const scores = userMsgs.map((m) => m.pronunciationScore ?? 0).filter((s) => s > 0);
       const grammarErrors = userMsgs.filter((m) => m.grammar && !m.grammar.isCorrect).length;
+      const mistakeTypes = userMsgs
+        .map((m) => m.grammar?.errorType)
+        .filter((t): t is string => !!t && t !== "None");
       const now = Date.now();
       addPastSession({
         id: uid(),
@@ -54,6 +57,7 @@ export function PracticeRoom() {
           : 0,
         grammarErrorsCount: grammarErrors,
         messageCount: messages.length,
+        mistakeTypes,
       });
     }
     endSession();
