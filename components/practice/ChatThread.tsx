@@ -14,6 +14,7 @@ import {
   Play,
 } from "lucide-react";
 import { speak } from "@/lib/tts";
+import { PracticeCorrection } from "./PracticeCorrection";
 
 export function ChatThread() {
   const messages = useSessionStore((s) => s.messages);
@@ -207,6 +208,10 @@ function TutorCard({
       {grammar.encouragement && (
         <div className="mt-3 text-[12px] italic text-amber-700">{grammar.encouragement}</div>
       )}
+
+      <div className="mt-4 border-t border-amber-200 pt-4">
+        <PracticeCorrection target={grammar.corrected} />
+      </div>
     </div>
   );
 }

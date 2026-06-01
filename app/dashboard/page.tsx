@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Flame, Clock, MessageCircleHeart, Trophy, Trash2, BookOpen } from "lucide-react";
-import { useHistory, type PastSession } from "@/lib/store";
+import { ArrowLeft, Flame, Clock, MessageCircleHeart, Trophy, Trash2, BookOpen, Target } from "lucide-react";
+import { useHistory, useCorrections, type PastSession } from "@/lib/store";
 import { LevelCard } from "@/components/LevelCard";
 
 export default function DashboardPage() {
   const sessions = useHistory((s) => s.sessions);
   const clearHistory = useHistory((s) => s.clearHistory);
+  const correctionsMastered = useCorrections((s) => s.mastered);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -60,7 +61,7 @@ export default function DashboardPage() {
           <LevelCard />
         </div>
 
-        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <StatCard
             icon={<Clock className="h-5 w-5" />}
             label="Total practice"
@@ -80,6 +81,11 @@ export default function DashboardPage() {
             icon={<Flame className="h-5 w-5" />}
             label="Streak"
             value={`${streak} day${streak === 1 ? "" : "s"}`}
+          />
+          <StatCard
+            icon={<Target className="h-5 w-5" />}
+            label="Mistakes mastered"
+            value={`${correctionsMastered}`}
           />
         </div>
 

@@ -133,6 +133,28 @@ export const useHistory = create<HistoryState>()(
   )
 );
 
+type CorrectionsState = {
+  mastered: number;
+  attempted: number;
+  recordMastered: () => void;
+  recordSkipped: () => void;
+  reset: () => void;
+};
+
+export const useCorrections = create<CorrectionsState>()(
+  persist(
+    (set) => ({
+      mastered: 0,
+      attempted: 0,
+      recordMastered: () =>
+        set((s) => ({ mastered: s.mastered + 1, attempted: s.attempted + 1 })),
+      recordSkipped: () => set((s) => ({ attempted: s.attempted + 1 })),
+      reset: () => set({ mastered: 0, attempted: 0 }),
+    }),
+    { name: "speaksmart-corrections" }
+  )
+);
+
 export type LevelHistoryEntry = {
   ts: number;
   mastery: number;
