@@ -81,6 +81,7 @@ export function PracticeRoom() {
       speak(activeLesson.starterLine, {
         voiceName: voiceName ?? undefined,
         voiceHints: tutor.voiceHints,
+        gender: tutor.gender,
       });
   }, [activeLesson, messages.length, addMessage, ttsMuted, voiceName]);
 
@@ -239,7 +240,11 @@ export function PracticeRoom() {
 
       const [acc] = await Promise.all([chatPromise, grammarPromise]);
       if (!ttsMuted && acc)
-        speak(acc, { voiceName: voiceName ?? undefined, voiceHints: tutor.voiceHints });
+        speak(acc, {
+          voiceName: voiceName ?? undefined,
+          voiceHints: tutor.voiceHints,
+          gender: tutor.gender,
+        });
     },
     [
       scenario,

@@ -46,6 +46,7 @@ export function PracticeCorrection({ target }: { target: string }) {
       speak(target, {
         voiceName: voiceName ?? undefined,
         voiceHints: tutor.voiceHints,
+        gender: tutor.gender,
         rate: 0.9,
       });
   }

@@ -5,6 +5,7 @@ export type Accessory = "none" | "glasses" | "earrings" | "reading-glasses";
 export type AgeBand = "young" | "adult" | "senior";
 
 export type TeachingStyle = "warm" | "direct" | "encouraging" | "playful";
+export type Gender = "female" | "male";
 
 export type TutorPreset = {
   id: string;
@@ -12,6 +13,7 @@ export type TutorPreset = {
   tagline: string;
   personality: string; // injected into system prompt
   teachingStyle: TeachingStyle;
+  gender: Gender; // used for voice fallback so male tutors never sound female
   career?: string; // optional career badge ("Tech Lead", "Sales Coach", etc.)
   careerPrompt?: string; // optional career-context injection
   ageBand: AgeBand;
@@ -26,6 +28,63 @@ export type TutorPreset = {
   voiceHints: string[];
 };
 
+// Common name fragments found across Chrome, Edge, Safari, and Android
+// English voices. We over-list so at least one match lands on every device.
+export const MALE_VOICE_HINTS = [
+  // Chrome/Google
+  "Google UK English Male",
+  "Google US English Male",
+  "Google US English",
+  // Microsoft Edge / Windows
+  "Microsoft David",
+  "Microsoft Mark",
+  "Microsoft Guy",
+  "Microsoft Brian",
+  "Microsoft Eric",
+  "Microsoft Davis",
+  "Microsoft Christopher",
+  "Microsoft Tony",
+  "Microsoft Ryan",
+  "Microsoft Andrew",
+  // Apple
+  "Daniel",
+  "Alex",
+  "Fred",
+  "Aaron",
+  "Tom",
+  "Reed",
+  // Amazon Polly
+  "Matthew",
+  "Joey",
+  "Justin",
+  // Generic / android
+  "Male",
+];
+
+export const FEMALE_VOICE_HINTS = [
+  "Google UK English Female",
+  "Google US English Female",
+  "Microsoft Zira",
+  "Microsoft Aria",
+  "Microsoft Jenny",
+  "Microsoft Sonia",
+  "Microsoft Libby",
+  "Microsoft Catherine",
+  "Microsoft Hazel",
+  "Samantha",
+  "Karen",
+  "Tessa",
+  "Moira",
+  "Victoria",
+  "Susan",
+  "Joanna",
+  "Salli",
+  "Ivy",
+  "Kendra",
+  "Kimberly",
+  "Female",
+];
+
 export const TUTORS: TutorPreset[] = [
   // -------- Original 6 --------
   {
@@ -35,6 +94,7 @@ export const TUTORS: TutorPreset[] = [
     personality:
       "warm, patient, and encouraging. You celebrate every effort, never make the learner feel bad, and use simple natural language",
     teachingStyle: "warm",
+    gender: "female",
     ageBand: "young",
     appearance: {
       skin: "tan",
@@ -43,7 +103,7 @@ export const TUTORS: TutorPreset[] = [
       accessory: "none",
       accent: "amber",
     },
-    voiceHints: ["Samantha", "Jenny", "Aria", "Joanna", "Female"],
+    voiceHints: ["Samantha", "Jenny", "Aria", "Joanna", ...FEMALE_VOICE_HINTS],
   },
   {
     id: "alex",
@@ -52,6 +112,7 @@ export const TUTORS: TutorPreset[] = [
     personality:
       "direct, efficient, and professional. You give crisp feedback and stay focused on practical improvement. You skip filler and get to the point",
     teachingStyle: "direct",
+    gender: "male",
     ageBand: "adult",
     appearance: {
       skin: "light",
@@ -60,7 +121,7 @@ export const TUTORS: TutorPreset[] = [
       accessory: "glasses",
       accent: "brand",
     },
-    voiceHints: ["Guy", "Daniel", "Matthew", "Brian", "Male"],
+    voiceHints: ["Daniel", "Matthew", "Microsoft Guy", "Microsoft Brian", ...MALE_VOICE_HINTS],
   },
   {
     id: "priya",
@@ -69,6 +130,7 @@ export const TUTORS: TutorPreset[] = [
     personality:
       "encouraging, thoughtful, and detail-oriented. You praise specific things the learner did well before suggesting improvements. You explain rules clearly",
     teachingStyle: "encouraging",
+    gender: "female",
     ageBand: "adult",
     appearance: {
       skin: "medium",
@@ -77,7 +139,7 @@ export const TUTORS: TutorPreset[] = [
       accessory: "earrings",
       accent: "rose",
     },
-    voiceHints: ["Neerja", "Heera", "Raveena", "Aditi", "Female"],
+    voiceHints: ["Neerja", "Heera", "Raveena", "Aditi", ...FEMALE_VOICE_HINTS],
   },
   {
     id: "sam",
@@ -86,6 +148,7 @@ export const TUTORS: TutorPreset[] = [
     personality:
       "playful, friendly, and conversational. You use light humor, casual phrases, and make practice feel like chatting with a friend",
     teachingStyle: "playful",
+    gender: "female",
     ageBand: "young",
     appearance: {
       skin: "tan",
@@ -94,7 +157,7 @@ export const TUTORS: TutorPreset[] = [
       accessory: "none",
       accent: "emerald",
     },
-    voiceHints: ["Karen", "Olivia", "Tessa", "Libby", "Female"],
+    voiceHints: ["Karen", "Olivia", "Tessa", "Libby", ...FEMALE_VOICE_HINTS],
   },
   {
     id: "marcus",
@@ -103,6 +166,7 @@ export const TUTORS: TutorPreset[] = [
     personality:
       "calm, steady, and reassuring. You speak slowly and clearly, and you never rush the learner. Your tone is grounded and confidence-building",
     teachingStyle: "warm",
+    gender: "male",
     ageBand: "adult",
     appearance: {
       skin: "deep",
@@ -111,7 +175,7 @@ export const TUTORS: TutorPreset[] = [
       accessory: "glasses",
       accent: "indigo",
     },
-    voiceHints: ["Brian", "Eric", "Davis", "Ryan", "Male"],
+    voiceHints: ["Microsoft Brian", "Microsoft Eric", "Microsoft Davis", "Microsoft Ryan", ...MALE_VOICE_HINTS],
   },
   {
     id: "luna",
@@ -120,6 +184,7 @@ export const TUTORS: TutorPreset[] = [
     personality:
       "witty, modern, and sharp. You use contemporary expressions and challenge the learner to push their range. You expect a bit more and reward effort with sharper feedback",
     teachingStyle: "direct",
+    gender: "female",
     ageBand: "young",
     appearance: {
       skin: "light",
@@ -128,7 +193,7 @@ export const TUTORS: TutorPreset[] = [
       accessory: "earrings",
       accent: "violet",
     },
-    voiceHints: ["Aria", "Jenny", "Sonia", "Emma", "Female"],
+    voiceHints: ["Aria", "Jenny", "Sonia", "Emma", ...FEMALE_VOICE_HINTS],
   },
 
   // -------- New 4 adult / career-specialist tutors --------
@@ -142,6 +207,7 @@ export const TUTORS: TutorPreset[] = [
     personality:
       "experienced, patient, and academically warm. You speak slowly with measured authority, like a senior doctor mentoring a new resident. You explain things thoroughly and never condescend",
     teachingStyle: "encouraging",
+    gender: "male",
     ageBand: "senior",
     appearance: {
       skin: "medium",
@@ -151,7 +217,7 @@ export const TUTORS: TutorPreset[] = [
       accent: "sky",
       facialHair: "stubble",
     },
-    voiceHints: ["Ravi", "Prabhat", "Madhur", "Daniel", "Brian", "Male"],
+    voiceHints: ["Ravi", "Prabhat", "Madhur", ...MALE_VOICE_HINTS],
   },
   {
     id: "margaret",
@@ -163,6 +229,7 @@ export const TUTORS: TutorPreset[] = [
     personality:
       "polished, confident, and warmly authoritative. You speak with the precision of a veteran executive. You expect high standards but coach with respect and never lecture",
     teachingStyle: "direct",
+    gender: "female",
     ageBand: "senior",
     appearance: {
       skin: "light",
@@ -171,7 +238,7 @@ export const TUTORS: TutorPreset[] = [
       accessory: "earrings",
       accent: "slate",
     },
-    voiceHints: ["Sonia", "Aria", "Catherine", "Susan", "Emma", "Female"],
+    voiceHints: ["Sonia", "Catherine", "Susan", "Emma", ...FEMALE_VOICE_HINTS],
   },
   {
     id: "diego",
@@ -183,6 +250,7 @@ export const TUTORS: TutorPreset[] = [
     personality:
       "easygoing, friendly, and genuinely curious about the learner's life. You chat like an old friend over coffee, ask about their day, share quick reactions, and keep the energy warm",
     teachingStyle: "playful",
+    gender: "male",
     ageBand: "adult",
     appearance: {
       skin: "tan",
@@ -192,7 +260,7 @@ export const TUTORS: TutorPreset[] = [
       accent: "amber",
       facialHair: "beard",
     },
-    voiceHints: ["Guy", "Davis", "Daniel", "Matthew", "Male"],
+    voiceHints: ["Microsoft Guy", "Microsoft Davis", "Daniel", "Matthew", ...MALE_VOICE_HINTS],
   },
   {
     id: "wei",
@@ -204,6 +272,7 @@ export const TUTORS: TutorPreset[] = [
     personality:
       "calm, precise, and pragmatic — the way a senior staff engineer speaks. You give thoughtful concrete feedback and respect the learner's time. You're warm but efficient",
     teachingStyle: "encouraging",
+    gender: "male",
     ageBand: "adult",
     appearance: {
       skin: "tan",
@@ -212,7 +281,7 @@ export const TUTORS: TutorPreset[] = [
       accessory: "reading-glasses",
       accent: "indigo",
     },
-    voiceHints: ["Liang", "Yunjian", "Eric", "Guy", "Davis", "Male"],
+    voiceHints: ["Liang", "Yunjian", "Microsoft Eric", "Microsoft Guy", ...MALE_VOICE_HINTS],
   },
 ];
 
