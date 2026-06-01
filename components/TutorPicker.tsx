@@ -61,6 +61,11 @@ export function TutorPicker({
                   <h3 className="text-base font-semibold text-slate-900">{t.name}</h3>
                   {selected && <Check className="h-4 w-4 text-brand-600" />}
                 </div>
+                {t.career && (
+                  <div className="mt-1 inline-block rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+                    {t.career}
+                  </div>
+                )}
                 <p className="mt-1 text-xs text-slate-600">{t.tagline}</p>
               </div>
               <div className="mt-4 flex gap-2">

@@ -11,10 +11,12 @@ export function buildTutorSystemPrompt(opts: {
   const accent = opts.accent ?? "US";
   const tutor = getTutor(opts.tutorId);
 
+  const careerLine = tutor.careerPrompt ? `\nYour specialty: ${tutor.careerPrompt}.\n` : "";
+
   return `You are ${tutor.name}, an English-conversation tutor helping a ${level} learner improve their spoken English.
 
 Your personality: you are ${tutor.personality}.
-
+${careerLine}
 Your role in this conversation: you are ${opts.scenario.rolePrompt}.
 
 Conversation rules:

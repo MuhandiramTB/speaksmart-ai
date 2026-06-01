@@ -20,6 +20,8 @@ const HAIR_COLOR: Record<string, string> = {
   blonde: "from-amber-300 to-amber-400",
   auburn: "from-orange-700 to-rose-800",
   gray: "from-slate-400 to-slate-500",
+  silver: "from-slate-200 to-slate-400",
+  saltpepper: "from-slate-700 to-slate-400",
 };
 
 export function TutorAvatar({
@@ -112,7 +114,8 @@ export function TutorAvatar({
           <Eye side="right" state={state} pupilOffset={pupilOffset} />
 
           {/* Glasses */}
-          {tutor.appearance.accessory === "glasses" && <Glasses />}
+          {tutor.appearance.accessory === "glasses" && <Glasses variant="standard" />}
+          {tutor.appearance.accessory === "reading-glasses" && <Glasses variant="reading" />}
 
           {/* Cheeks */}
           <span
@@ -130,6 +133,14 @@ export function TutorAvatar({
 
           {/* Earrings */}
           {tutor.appearance.accessory === "earrings" && <Earrings />}
+
+          {/* Facial hair (under mouth so mouth shows on top) */}
+          {tutor.appearance.facialHair === "beard" && (
+            <span className="absolute top-[76%] left-1/2 h-[20%] w-[58%] -translate-x-1/2 rounded-[50%_50%_60%_60%] bg-gradient-to-b from-slate-700 to-slate-900 opacity-80" />
+          )}
+          {tutor.appearance.facialHair === "stubble" && (
+            <span className="absolute top-[78%] left-1/2 h-[14%] w-[50%] -translate-x-1/2 rounded-[40%_40%_50%_50%] bg-slate-700/30" />
+          )}
 
           {/* Mouth */}
           <Mouth state={state} mood={mood} />
@@ -212,6 +223,16 @@ function Hair({ style, gradient }: { style: string; gradient: string }) {
         <div
           className={cn(
             "absolute top-[6%] left-1/2 h-[22%] w-[78%] -translate-x-1/2 rounded-[50%] bg-gradient-to-b opacity-90",
+            gradient
+          )}
+        />
+      );
+    case "bald":
+      // Subtle hairline rim only — for a clean bald look use facialHair to add identity
+      return (
+        <div
+          className={cn(
+            "absolute top-[10%] left-1/2 h-[8%] w-[68%] -translate-x-1/2 rounded-[50%] bg-gradient-to-b opacity-50",
             gradient
           )}
         />
@@ -329,12 +350,25 @@ function Eye({
   );
 }
 
-function Glasses() {
+function Glasses({ variant = "standard" }: { variant?: "standard" | "reading" }) {
+  // Reading glasses sit lower on the nose — gives a "senior / scholarly" look
+  const top = variant === "reading" ? "top-[50%]" : "top-[44%]";
+  const bridgeTop = variant === "reading" ? "top-[53%]" : "top-[47%]";
   return (
     <>
-      <span className="absolute top-[44%] left-[22%] h-[10%] w-[18%] rounded-[40%] border-[2px] border-slate-900" />
-      <span className="absolute top-[44%] right-[22%] h-[10%] w-[18%] rounded-[40%] border-[2px] border-slate-900" />
-      <span className="absolute top-[47%] left-[40%] h-[2%] w-[5%] bg-slate-900" />
+      <span
+        className={cn(
+          "absolute left-[22%] h-[10%] w-[18%] rounded-[40%] border-[2px] border-slate-900",
+          top
+        )}
+      />
+      <span
+        className={cn(
+          "absolute right-[22%] h-[10%] w-[18%] rounded-[40%] border-[2px] border-slate-900",
+          top
+        )}
+      />
+      <span className={cn("absolute left-[40%] h-[2%] w-[5%] bg-slate-900", bridgeTop)} />
     </>
   );
 }
