@@ -29,12 +29,21 @@ export type Message = {
 export type Level = "beginner" | "intermediate" | "advanced";
 export type Accent = "US" | "UK" | "AU";
 
+export type ActiveLesson = {
+  trackId: string;
+  lessonId: string;
+  goal: string;
+  starterLine: string;
+  examples: string[];
+};
+
 type SessionState = {
   scenario: Scenario | null;
+  activeLesson: ActiveLesson | null;
   messages: Message[];
   sessionStartedAt: number | null;
   isRecording: boolean;
-  setScenario: (s: Scenario | null) => void;
+  setScenario: (s: Scenario | null, lesson?: ActiveLesson | null) => void;
   addMessage: (m: Message) => void;
   patchMessage: (id: string, patch: Partial<Message>) => void;
   removeMessage: (id: string) => void;
@@ -45,10 +54,11 @@ type SessionState = {
 
 export const useSessionStore = create<SessionState>((set) => ({
   scenario: null,
+  activeLesson: null,
   messages: [],
   sessionStartedAt: null,
   isRecording: false,
-  setScenario: (scenario) => set({ scenario }),
+  setScenario: (scenario, lesson = null) => set({ scenario, activeLesson: lesson }),
   addMessage: (m) => set((s) => ({ messages: [...s.messages, m] })),
   patchMessage: (id, patch) =>
     set((s) => ({
@@ -58,7 +68,8 @@ export const useSessionStore = create<SessionState>((set) => ({
     set((s) => ({ messages: s.messages.filter((m) => m.id !== id) })),
   setRecording: (isRecording) => set({ isRecording }),
   startSession: () => set({ sessionStartedAt: Date.now() }),
-  endSession: () => set({ messages: [], scenario: null, sessionStartedAt: null }),
+  endSession: () =>
+    set({ messages: [], scenario: null, activeLesson: null, sessionStartedAt: null }),
 }));
 
 type Settings = {
@@ -119,5 +130,40 @@ export const useHistory = create<HistoryState>()(
       clearHistory: () => set({ sessions: [] }),
     }),
     { name: "speaksmart-history" }
+  )
+);
+
+export type TrackProgress = {
+  completedLessons: Record<string, string>; // trackId+lessonId -> ISO date completed
+};
+
+type TrackState = TrackProgress & {
+  markLessonComplete: (trackId: string, lessonId: string) => void;
+  isLessonComplete: (trackId: string, lessonId: string) => boolean;
+  resetTrack: (trackId: string) => void;
+};
+
+export const useTrackProgress = create<TrackState>()(
+  persist(
+    (set, get) => ({
+      completedLessons: {},
+      markLessonComplete: (trackId, lessonId) =>
+        set((state) => ({
+          completedLessons: {
+            ...state.completedLessons,
+            [`${trackId}:${lessonId}`]: new Date().toISOString(),
+          },
+        })),
+      isLessonComplete: (trackId, lessonId) =>
+        !!get().completedLessons[`${trackId}:${lessonId}`],
+      resetTrack: (trackId) =>
+        set((state) => {
+          const filtered = Object.fromEntries(
+            Object.entries(state.completedLessons).filter(([k]) => !k.startsWith(`${trackId}:`))
+          );
+          return { completedLessons: filtered };
+        }),
+    }),
+    { name: "speaksmart-tracks" }
   )
 );

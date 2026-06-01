@@ -1,14 +1,15 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Settings as SettingsIcon, Volume2, VolumeX } from "lucide-react";
+import { ArrowLeft, Settings as SettingsIcon, Volume2, VolumeX, Target, ChevronDown, ChevronUp } from "lucide-react";
 import { MicButton } from "./MicButton";
 import { ChatThread } from "./ChatThread";
 import {
   useSessionStore,
   useSettings,
   useHistory,
+  useTrackProgress,
   type GrammarResult,
 } from "@/lib/store";
 import { speak, stopSpeaking } from "@/lib/tts";
@@ -19,6 +20,7 @@ function uid() {
 
 export function PracticeRoom() {
   const scenario = useSessionStore((s) => s.scenario)!;
+  const activeLesson = useSessionStore((s) => s.activeLesson);
   const messages = useSessionStore((s) => s.messages);
   const sessionStartedAt = useSessionStore((s) => s.sessionStartedAt);
   const addMessage = useSessionStore((s) => s.addMessage);
@@ -30,10 +32,26 @@ export function PracticeRoom() {
 
   const { level, accent, voiceName, ttsMuted, toggleTtsMute } = useSettings();
   const addPastSession = useHistory((s) => s.addSession);
+  const markLessonComplete = useTrackProgress((s) => s.markLessonComplete);
+
+  const starterSeededRef = useRef(false);
 
   useEffect(() => {
     if (!sessionStartedAt) startSession();
   }, [sessionStartedAt, startSession]);
+
+  useEffect(() => {
+    if (!activeLesson || starterSeededRef.current) return;
+    if (messages.length > 0) return;
+    starterSeededRef.current = true;
+    addMessage({
+      id: uid(),
+      role: "assistant",
+      content: activeLesson.starterLine,
+      createdAt: Date.now(),
+    });
+    if (!ttsMuted) speak(activeLesson.starterLine, { voiceName: voiceName ?? undefined });
+  }, [activeLesson, messages.length, addMessage, ttsMuted, voiceName]);
 
   const finishAndExit = useCallback(() => {
     stopSpeaking();
@@ -59,9 +77,12 @@ export function PracticeRoom() {
         messageCount: messages.length,
         mistakeTypes,
       });
+      if (activeLesson && userMsgs.length >= 3) {
+        markLessonComplete(activeLesson.trackId, activeLesson.lessonId);
+      }
     }
     endSession();
-  }, [messages, sessionStartedAt, scenario, addPastSession, endSession]);
+  }, [messages, sessionStartedAt, scenario, addPastSession, endSession, activeLesson, markLessonComplete]);
 
   const handleAudio = useCallback(
     async (blob: Blob, mimeType: string) => {
@@ -236,6 +257,7 @@ export function PracticeRoom() {
 
       <div className="flex-1 overflow-y-auto bg-slate-50">
         <div className="mx-auto max-w-3xl py-6">
+          {activeLesson && <LessonBanner lesson={activeLesson} />}
           <ChatThread />
         </div>
       </div>
@@ -243,6 +265,56 @@ export function PracticeRoom() {
       <div className="border-t border-slate-200 bg-white px-4 py-6">
         <MicButton onAudioReady={handleAudio} />
       </div>
+    </div>
+  );
+}
+
+function LessonBanner({
+  lesson,
+}: {
+  lesson: { goal: string; examples: string[] };
+}) {
+  const [open, setOpen] = useState(true);
+  return (
+    <div className="mx-2 mb-4 rounded-2xl border border-brand-200 bg-brand-50/60 p-4 text-sm text-brand-900">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between text-left"
+        aria-expanded={open}
+      >
+        <span className="inline-flex items-center gap-2 font-semibold">
+          <Target className="h-4 w-4" />
+          Lesson goal
+        </span>
+        {open ? (
+          <ChevronUp className="h-4 w-4 text-brand-700" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-brand-700" />
+        )}
+      </button>
+      {open && (
+        <>
+          <p className="mt-2">{lesson.goal}</p>
+          {lesson.examples.length > 0 && (
+            <div className="mt-3">
+              <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-brand-700">
+                Try saying
+              </div>
+              <ul className="flex flex-wrap gap-1.5">
+                {lesson.examples.map((ex, i) => (
+                  <li
+                    key={i}
+                    className="rounded-full bg-white px-3 py-1 text-[12px] text-brand-900 shadow-sm"
+                  >
+                    {ex}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

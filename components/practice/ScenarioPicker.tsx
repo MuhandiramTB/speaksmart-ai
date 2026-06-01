@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { SCENARIOS } from "@/lib/scenarios";
 import { useSessionStore } from "@/lib/store";
-import { ArrowLeft, Settings as SettingsIcon } from "lucide-react";
+import { ArrowLeft, Settings as SettingsIcon, BarChart3 } from "lucide-react";
 import { OnboardingOverlay } from "@/components/OnboardingOverlay";
+import { TrackPicker } from "./TrackPicker";
 
 export function ScenarioPicker() {
   const setScenario = useSessionStore((s) => s.setScenario);
@@ -21,32 +22,45 @@ export function ScenarioPicker() {
           <ArrowLeft className="h-4 w-4" />
           Home
         </Link>
-        <Link
-          href="/settings"
-          aria-label="Settings"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100"
-        >
-          <SettingsIcon className="h-5 w-5" />
-        </Link>
-      </header>
-      <div className="mx-auto max-w-3xl px-6 py-10">
-        <h2 className="mb-2 text-2xl font-bold text-slate-900">Pick a scenario</h2>
-        <p className="mb-6 text-slate-600">Choose what you want to practice today.</p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {SCENARIOS.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setScenario(s)}
-              className="group rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md"
-            >
-              <div className="mb-2 text-3xl">{s.emoji}</div>
-              <h3 className="text-base font-semibold text-slate-900 group-hover:text-brand-700">
-                {s.title}
-              </h3>
-              <p className="mt-1 text-sm text-slate-600">{s.description}</p>
-            </button>
-          ))}
+        <div className="flex items-center gap-1">
+          <Link
+            href="/dashboard"
+            aria-label="Dashboard"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100"
+          >
+            <BarChart3 className="h-5 w-5" />
+          </Link>
+          <Link
+            href="/settings"
+            aria-label="Settings"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100"
+          >
+            <SettingsIcon className="h-5 w-5" />
+          </Link>
         </div>
+      </header>
+      <div className="mx-auto max-w-4xl px-6 py-10">
+        <TrackPicker />
+
+        <section>
+          <h2 className="mb-1 text-2xl font-bold text-slate-900">Free practice</h2>
+          <p className="mb-5 text-slate-600">Pick a scenario and chat freely — no daily plan.</p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {SCENARIOS.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setScenario(s)}
+                className="group rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md"
+              >
+                <div className="mb-2 text-3xl">{s.emoji}</div>
+                <h3 className="text-base font-semibold text-slate-900 group-hover:text-brand-700">
+                  {s.title}
+                </h3>
+                <p className="mt-1 text-sm text-slate-600">{s.description}</p>
+              </button>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );
