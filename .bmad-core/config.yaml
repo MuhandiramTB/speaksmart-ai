@@ -1,0 +1,25 @@
+project:
+  name: SpeakSmart
+  description: Free AI spoken-English tutor for students
+  type: greenfield-web
+  methodology: bmad+kiro
+  language: typescript
+
+paths:
+  prd: docs/prd.md
+  architecture: docs/architecture.md
+  stories: docs/stories/
+  kiro_specs: .kiro/specs/speaksmart/
+
+agents:
+  analyst: .bmad-core/agents/analyst.md
+  pm: .bmad-core/agents/pm.md
+  architect: .bmad-core/agents/architect.md
+  sm: .bmad-core/agents/sm.md
+  dev: .bmad-core/agents/dev.md
+  qa: .bmad-core/agents/qa.md
+
+workflow:
+  current_phase: implementation
+  current_epic: 1
+  current_story: 1.2
