@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Flame, Clock, MessageCircleHeart, Trophy, Trash2, BookOpen } from "lucide-react";
 import { useHistory, type PastSession } from "@/lib/store";
+import { LevelCard } from "@/components/LevelCard";
 
 export default function DashboardPage() {
   const sessions = useHistory((s) => s.sessions);
@@ -54,6 +55,10 @@ export default function DashboardPage() {
       <main className="mx-auto max-w-4xl px-6 py-8">
         <h1 className="mb-1 text-2xl font-bold">Your progress</h1>
         <p className="mb-6 text-sm text-slate-600">Stored privately on this device.</p>
+
+        <div className="mb-8">
+          <LevelCard />
+        </div>
 
         <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
@@ -223,24 +228,29 @@ function EmptyState({ count }: { count: number }) {
           <ArrowLeft className="h-4 w-4" /> Home
         </Link>
       </header>
-      <main className="mx-auto max-w-md px-6 py-20 text-center">
-        <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-100 text-brand-700">
-          <BookOpen className="h-7 w-7" />
+      <main className="mx-auto max-w-2xl px-6 py-12">
+        <div className="mb-8">
+          <LevelCard />
         </div>
-        <h1 className="mb-2 text-2xl font-bold">Keep going!</h1>
-        <p className="mb-6 text-slate-600">
-          {count === 0
-            ? "Finish your first practice session to start seeing progress."
-            : `You've completed ${count} session${count === 1 ? "" : "s"}. Complete ${
-                3 - count
-              } more to unlock progress charts.`}
-        </p>
-        <Link
-          href="/practice"
-          className="inline-flex rounded-full bg-brand-600 px-6 py-3 font-semibold text-white shadow hover:bg-brand-700"
-        >
-          Start practicing
-        </Link>
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-100 text-brand-700">
+            <BookOpen className="h-7 w-7" />
+          </div>
+          <h1 className="mb-2 text-2xl font-bold">Keep going!</h1>
+          <p className="mb-6 text-slate-600">
+            {count === 0
+              ? "Finish your first practice session to start seeing progress charts."
+              : `You've completed ${count} session${count === 1 ? "" : "s"}. Complete ${
+                  3 - count
+                } more to unlock progress charts.`}
+          </p>
+          <Link
+            href="/practice"
+            className="inline-flex rounded-full bg-brand-600 px-6 py-3 font-semibold text-white shadow hover:bg-brand-700"
+          >
+            Start practicing
+          </Link>
+        </div>
       </main>
     </div>
   );

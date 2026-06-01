@@ -133,6 +133,55 @@ export const useHistory = create<HistoryState>()(
   )
 );
 
+export type LevelHistoryEntry = {
+  ts: number;
+  mastery: number;
+  source: "assessment" | "session";
+};
+
+type LevelState = {
+  mastery: number; // 0-100
+  history: LevelHistoryEntry[];
+  hasTakenAssessment: boolean;
+  setFromAssessment: (mastery: number) => void;
+  updateFromSession: (sessionScore: number) => void;
+  reset: () => void;
+};
+
+export const useLevel = create<LevelState>()(
+  persist(
+    (set, get) => ({
+      mastery: 0,
+      history: [],
+      hasTakenAssessment: false,
+      setFromAssessment: (mastery) =>
+        set({
+          mastery,
+          hasTakenAssessment: true,
+          history: [
+            ...get().history,
+            { ts: Date.now(), mastery, source: "assessment" as const },
+          ].slice(-200),
+        }),
+      updateFromSession: (sessionScore) => {
+        const prev = get().mastery;
+        // If user hasn't taken assessment yet, treat first session as a soft baseline
+        const base = prev > 0 ? prev : sessionScore;
+        const next = Math.round(base * 0.8 + sessionScore * 0.2);
+        set({
+          mastery: next,
+          history: [
+            ...get().history,
+            { ts: Date.now(), mastery: next, source: "session" as const },
+          ].slice(-200),
+        });
+      },
+      reset: () => set({ mastery: 0, history: [], hasTakenAssessment: false }),
+    }),
+    { name: "speaksmart-level" }
+  )
+);
+
 export type TrackProgress = {
   completedLessons: Record<string, string>; // trackId+lessonId -> ISO date completed
 };

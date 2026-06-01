@@ -7,6 +7,7 @@ import { ArrowLeft, Settings as SettingsIcon, BarChart3 } from "lucide-react";
 import { OnboardingOverlay } from "@/components/OnboardingOverlay";
 import { TrackPicker } from "./TrackPicker";
 import { ScenarioIcon } from "./ScenarioIcon";
+import { LevelCard } from "@/components/LevelCard";
 
 export function ScenarioPicker() {
   const setScenario = useSessionStore((s) => s.setScenario);
@@ -41,6 +42,9 @@ export function ScenarioPicker() {
         </div>
       </header>
       <div className="mx-auto max-w-4xl px-6 py-10">
+        <div className="mb-8">
+          <LevelCard />
+        </div>
         <TrackPicker />
 
         <section>

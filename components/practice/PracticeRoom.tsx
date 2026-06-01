@@ -10,8 +10,10 @@ import {
   useSettings,
   useHistory,
   useTrackProgress,
+  useLevel,
   type GrammarResult,
 } from "@/lib/store";
+import { utteranceMastery, sessionMastery } from "@/lib/level";
 import { speak, stopSpeaking, useIsSpeaking } from "@/lib/tts";
 import { TutorAvatar, type AvatarState } from "./TutorAvatar";
 
@@ -34,6 +36,7 @@ export function PracticeRoom() {
   const { level, accent, voiceName, ttsMuted, toggleTtsMute } = useSettings();
   const addPastSession = useHistory((s) => s.addSession);
   const markLessonComplete = useTrackProgress((s) => s.markLessonComplete);
+  const updateLevelFromSession = useLevel((s) => s.updateFromSession);
 
   const starterSeededRef = useRef(false);
   const [micStatus, setMicStatus] = useState<"idle" | "requesting" | "recording" | "processing" | "error">("idle");
@@ -92,9 +95,26 @@ export function PracticeRoom() {
       if (activeLesson && userMsgs.length >= 3) {
         markLessonComplete(activeLesson.trackId, activeLesson.lessonId);
       }
+      const utteranceScores = userMsgs.map((m) =>
+        utteranceMastery({
+          pronunciation: m.pronunciationScore ?? 0,
+          grammarCorrect: m.grammar?.isCorrect ?? true,
+        })
+      );
+      const sessionScore = sessionMastery(utteranceScores);
+      if (sessionScore > 0) updateLevelFromSession(sessionScore);
     }
     endSession();
-  }, [messages, sessionStartedAt, scenario, addPastSession, endSession, activeLesson, markLessonComplete]);
+  }, [
+    messages,
+    sessionStartedAt,
+    scenario,
+    addPastSession,
+    endSession,
+    activeLesson,
+    markLessonComplete,
+    updateLevelFromSession,
+  ]);
 
   const handleAudio = useCallback(
     async (blob: Blob, mimeType: string) => {

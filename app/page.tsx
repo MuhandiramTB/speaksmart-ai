@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Mic, MessageCircle, Heart, Compass } from "lucide-react";
 import { ShareButton } from "@/components/ShareButton";
+import { LevelCard } from "@/components/LevelCard";
 
 export default function LandingPage() {
   return (
@@ -32,6 +33,10 @@ export default function LandingPage() {
           </Link>
         </div>
         <p className="mt-3 text-sm text-slate-500">No sign-up required.</p>
+      </section>
+
+      <section className="mx-auto max-w-3xl px-6 pb-12">
+        <LevelCard />
       </section>
 
       <section className="mx-auto max-w-5xl px-6 pb-24">
